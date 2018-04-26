@@ -2,6 +2,8 @@
 from pathlib import Path
 import re
 
+import pandas as pd
+
 
 class TreeParser:
     """Reads a given tree structure and returns a dataframe"""
@@ -30,7 +32,8 @@ class TreeParser:
         for cur_format in self.dir_format:
             partial_results = self._parse_dir(
                 cur_format, partial_results)
-        self._parse_files(partial_results)
+        results = self._parse_files(partial_results)
+        return pd.DataFrame(results)
 
     def _parse_dir(self, dir_format, partial_results):
         next_results = {}
