@@ -15,7 +15,9 @@ In each directory there are files with the running time in them. The file name i
 `1923_slurm.out` for job no. `1923`. The running time is identified with the line e.g.,
 `Total time (s) = 25`
 
-```
+```python
+from treeparser import TreeParser
+
 parser = TreeParser(
     directory_format=[
         r'(?P<app>[^_]*)_(?P<input>.*)',
