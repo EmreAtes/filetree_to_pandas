@@ -17,6 +17,7 @@ class TreeParser:
             fields are given by named groups: `(?P<name>...)` other groups are
             discarded. Each list element corresponds to a directory level, and
             the last one is the file name format.
+            Any directory or file that doesn't match the format is ignored.
         file_regex : List[regex]
             regex is searched for in each file, and the result of the match is
             placed in the column with the corresponding group name.
@@ -41,9 +42,10 @@ class TreeParser:
         for current_dir, old_result in partial_results.items():
             for file_or_dir in current_dir.iterdir():
                 res = re.match(dir_format, file_or_dir.name)
-                if res:
-                    next_results[file_or_dir] = {**old_result,
-                                                 **res.groupdict()}
+                if res is None:
+                    print(f"Regex {dir_format} failed for file {file_or_dir}")
+                    continue
+                next_results[file_or_dir] = {**old_result, **res.groupdict()}
         return next_results
 
     def _parse_files(self, partial_results):
@@ -52,6 +54,9 @@ class TreeParser:
             with filename.open('r') as f:
                 lines = f.read()
             for regex in self.file_regex:
-                old_result = {**old_result, **regex.search(lines).groupdict()}
+                res = regex.search(lines)
+                if res is None:
+                    print(f"Regex {regex} failed for file {filename}")
+                old_result = {**old_result, **res.groupdict()}
             results.append(old_result)
         return results
